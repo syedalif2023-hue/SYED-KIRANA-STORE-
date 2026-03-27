@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Grocery App</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1b5e20">
+    <link rel="apple-touch-icon" href="https://i.postimg.cc/j57H1PP8/file-0000000062fc7208bcb58f5264a5b1d7.png">
+
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('service-worker.js')
+            .then(reg => console.log('App Ready!'))
+            .catch(err => console.log('Error:', err));
+        });
+      }
+    </script>
+    <style>
+        :root { --primary: #1b5e20; --bg: #f4f7f4; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); padding: 10px; margin: 0; }
+        .container { max-width: 500px; margin: auto; background: white; padding: 15px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); min-height: 95vh; display: flex; flex-direction: column; }
+        h1 { text-align: center; color: var(--primary); font-size: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top: 0; }
+        
+        /* Category List Style */
+        #home-page { flex-grow: 1; }
+        .category-item { background: #f1f8e9; margin: 10px 0; padding: 18px; border-radius: 12px; cursor: pointer; font-weight: bold; display: flex; justify-content: space-between; border: 1px solid #dcedc8; }
+
+        .hidden { display: none; }
+        .item-row { padding: 15px 0; border-bottom: 1px solid #eee; }
+        .item-name { font-weight: bold; display: flex; align-items: center; gap: 8px; margin-bottom: 10px; color: #333; }
+        .controls-grid { display: grid; grid-template-columns: 0.8fr 1.5fr 0.8fr; gap: 8px; margin-bottom: 8px; }
+        input, select { padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; }
+        .total-box { background: #fffde7; padding: 8px; border-radius: 6px; text-align: right; font-weight: bold; color: #d32f2f; font-size: 14px; }
+
+        .footer-btns { position: sticky; bottom: 0; background: white; padding: 15px 0; display: flex; gap: 10px; }
+        button { flex: 1; padding: 14px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        .btn-back { background: #eceff1; color: #455a64; }
+        .btn-save { background: var(--primary); color: white; }
+        
+        /* WhatsApp & Contact Section (At Bottom) */
+        .whatsapp-section { margin-top: auto; padding-top: 20px; border-top: 2px solid #eee; }
+        .contact-picker-area { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; }
+        .num-row { display: flex; gap: 8px; }
+        .num-input { flex: 1; border: 2px solid #81c784; font-size: 16px; font-weight: bold; }
+        .btn-contact { background: #007bff; color: white; padding: 0 15px; font-size: 12px; white-space: nowrap; }
+        .btn-wa { background: #25D366; color: white; width: 100%; font-size: 18px; height: 55px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="home-page">
+        <h1>সব ধরনের সামগ্রী লিস্ট</h1>
+        <div id="category-list"></div>
+    </div>
+
+    <div id="items-page" class="hidden">
+        <h1 id="cat-title">Items</h1>
+        <div id="items-container"></div>
+        <div class="footer-btns">
+            <button class="btn-back" onclick="goToHome()">Back</button>
+            <button class="btn-save" onclick="goToHome()">Save & Close</button>
+        </div>
+    </div>
+
+    <div class="whatsapp-section">
+        <div class="contact-picker-area">
+            <label style="font-weight: bold; color: #555; font-size: 13px;">নিচে নম্বর বেছে নিন (Choose Number):</label>
+            <div class="num-row">
+                <input type="tel" id="wa-num" class="num-input" placeholder="নম্বর লিখুন বা বাছুন">
+                <button id="btn-picker" class="btn-contact" onclick="selectFromContacts()">Choose Contact</button>
+            </div>
+        </div>
+
+        <button class="btn-wa" onclick="sendWA()">
+            <span>WhatsApp-এ অর্ডার দিন</span>
+        </button>
+    </div>
+</div>
+
+<script>
+    const data = {
+        "A) নিত্যপ্রয়োজনীয় সবজি": ["আলু", "পেঁয়াজ", "আদা", "রসুন", "কাঁচা লঙ্কা"],
+        "B) ডাল ও শস্য": ["চাল", "আটা", "ময়দা", "সর্ষের তেল", "চিনি", "চা পাতা", "মুসুর ডাল", "মুড়ি", "গুড়", "মটর", "মুগ ডাল", "ছোলা", "অড়হর ডাল"],
+        "C) মশলার তালিকা": ["হলুদ", "কাশ্মীরি লঙ্কা গুঁড়ো", "ধনে গুঁড়ো", "জিরে গুঁড়ো", "নুন", "বিরিয়ানি মশলা", "চিকেন মশলা", "মাংসের মশলা", "পোস্ত", "সর্ষে", "তেজপাতা", "পাঁচ ফোড়ন", "লবঙ্গ", "গরম মশলা", "মৌরি", "গোলমরিচ", "কালো জিরে", "হিং", "দারুচিনি", "এলাচ", "বড় এলাচ", "কসুরি মেথি", "জোয়ান", "চাট মশলা", "জায়ফল", "জয়িত্রী"],
+        "D) তাজা সবজি": ["শসা", "ধনে পাতা", "লেবু", "গাজর", "টমেটো", "বেগুন", "পটল", "করলা", "কুমড়ো", "ঢ্যাঁড়স", "ফুলকপি", "বাঁধাকপি", "মুলো", "লাউ", "ঝিঙে", "পেঁপে"],
+        "E) তাজা ফল": ["কলা", "আপেল", "পেয়ারা", "আঙুর", "বেদানা", "আম", "লিচু", "তরমুজ", "নারকেল", "আনারস"],
+        "F) শুকনো ফল": ["কাজু", "আখরোট", "খেজুর", "কাঠবাদাম", "কিসমিস", "চীনাবাদাম", "পেস্তা"]
+    };
+
+    let selectedItems = {};
+
+    function init() {
+        const list = document.getElementById('category-list');
+        for (let cat in data) {
+            let d = document.createElement('div');
+            d.className = 'category-item';
+            d.innerHTML = `<span>${cat}</span> <span>➔</span>`;
+            d.onclick = () => showCat(cat);
+            list.appendChild(d);
+        }
+        
+        if (!('contacts' in navigator && 'select' in navigator.contacts)) {
+            document.getElementById('btn-picker').style.display = 'none';
+        }
+    }
+
+    async function selectFromContacts() {
+        const props = ['name', 'tel'];
+        const opts = { multiple: false };
+        try {
+            const contacts = await navigator.contacts.select(props, opts);
+            if (contacts.length && contacts[0].tel && contacts[0].tel.length > 0) {
+                let rawNum = contacts[0].tel[0].replace(/\s/g, '').replace(/-/g, '');
+                if(rawNum.startsWith('+')) rawNum = rawNum.substring(1);
+                document.getElementById('wa-num').value = rawNum;
+            }
+        } catch (err) {
+            console.log("Contact picker not used.");
+        }
+    }
+
+    function showCat(cat) {
+        document.getElementById('home-page').classList.add('hidden');
+        document.getElementById('items-page').classList.remove('hidden');
+        document.getElementById('cat-title').innerText = cat;
+        const container = document.getElementById('items-container');
+        container.innerHTML = '';
+
+        data[cat].forEach(item => {
+            const saved = selectedItems[item] || { qty: '', unit: 'Kg', rate: '' };
+            let div = document.createElement('div');
+            div.className = 'item-row';
+            div.innerHTML = `
+                <div class="item-name"><input type="checkbox" id="chk-${item}" ${selectedItems[item] ? 'checked' : ''}> <label>${item}</label></div>
+                <div class="controls-grid">
+                    <input type="number" id="q-${item}" placeholder="Qty" value="${saved.qty}" oninput="updatePrice('${item}')">
+                    <select id="u-${item}" onchange="updatePrice('${item}')">
+                        <option value="Kg" ${saved.unit==='Kg'?'selected':''}>Kg (Rs)</option>
+                        <option value="Gm" ${saved.unit==='Gm'?'selected':''}>Gm (Rs)</option>
+                        <option value="Pcs" ${saved.unit==='Pcs'?'selected':''}>Pcs (Rs)</option>
+                    </select>
+                    <input type="number" id="r-${item}" placeholder="Rate" value="${saved.rate}" oninput="updatePrice('${item}')">
+                </div>
+                <div class="total-box">মোট দাম: ₹ <span id="t-${item}">0.00</span></div>
+            `;
+            container.appendChild(div);
+            updatePrice(item);
+        });
+    }
+
+    function updatePrice(item) {
+        const q = parseFloat(document.getElementById(`q-${item}`).value) || 0;
+        const u = document.getElementById(`u-${item}`).value;
+        const r = parseFloat(document.getElementById(`r-${item}`).value) || 0;
+        let total = (u === "Gm") ? (r / 1000) * q : q * r;
+        document.getElementById(`t-${item}`).innerText = total.toFixed(2);
+    }
+
+    function goToHome() {
+        document.querySelectorAll('.item-row').forEach(row => {
+            const name = row.querySelector('label').innerText;
+            if (row.querySelector('input[type="checkbox"]').checked) {
+                selectedItems[name] = {
+                    qty: row.querySelector('input[id^="q-"]').value,
+                    unit: row.querySelector('select').value,
+                    rate: row.querySelector('input[id^="r-"]').value
+                };
+            } else { delete selectedItems[name]; }
+        });
+        document.getElementById('home-page').classList.remove('hidden');
+        document.getElementById('items-page').classList.add('hidden');
+    }
+
+    function sendWA() {
+        const num = document.getElementById('wa-num').value;
+        if(!num) return alert("দয়া করে একটি নম্বর লিখুন বা বাছুন!");
+        
+        let msg = "*🛒 বাজার লিস্ট ও বিল:*\n--------------------------\n";
+        let grandTotal = 0;
+        let hasItems = false;
+        
+        for (let key in selectedItems) {
+            let itm = selectedItems[key];
+            let itemTotal = itm.unit === "Gm" ? (itm.rate/1000)*itm.qty : itm.qty*itm.rate;
+            msg += `\n✅ *${key}*\n${itm.qty} ${itm.unit} x ${itm.rate} = *₹${itemTotal.toFixed(2)}*`;
+            grandTotal += itemTotal;
+            hasItems = true;
+        }
+        
+        if(!hasItems) return alert("Pehle list mein item select karein!");
+        msg += `\n\n*--------------------------*\n💰 *সর্বমোট বিল: ₹${grandTotal.toFixed(2)}*`;
+        window.open(`https://wa.me/${num}?text=${encodeURIComponent(msg)}`);
+    }
+
+    init();
+</script>
+</body>
+</html>

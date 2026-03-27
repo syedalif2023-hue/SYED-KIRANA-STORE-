@@ -1,0 +1,17 @@
+{
+  "name": "Smart Bazar List",
+  "short_name": "BazarApp",
+  "description": "Daily Grocery List and WhatsApp Ordering App",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1b5e20",
+  "icons": [
+    {
+      "src": "https://i.postimg.cc/j57H1PP8/file-0000000062fc7208bcb58f5264a5b1d7.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
