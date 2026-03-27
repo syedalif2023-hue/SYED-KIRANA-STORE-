@@ -14,15 +14,14 @@
 
     <style>
         :root { --primary: #1b5e20; --bg: #f4f7f4; --secondary: #388e3c; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        /* Box-sizing fix for mobile */
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
         
         body { 
             font-family: 'Segoe UI', Arial, sans-serif; 
             background: var(--bg); 
-            padding: 0; 
-            margin: 0; 
-            /* मोबाइल ओवरफ्लो फिक्स */
-            overflow-x: hidden;
+            overflow-x: hidden; /* Prevent side scrolling */
             width: 100%;
         }
 
@@ -32,22 +31,20 @@
             margin: auto; 
             background: white; 
             padding: 15px; 
-            /* स्क्रीन हाइट फिक्स */
-            min-height: 100vh; 
+            min-height: 100vh; /* Full screen height */
             display: flex; 
             flex-direction: column; 
-            box-shadow: none;
         }
 
-        h1 { text-align: center; color: var(--primary); font-size: 1.2rem; border-bottom: 2px solid #eee; padding-bottom: 10px; margin: 10px 0; }
+        h1 { text-align: center; color: var(--primary); font-size: 1.2rem; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 15px; }
         
-        #home-page { flex-grow: 1; width: 100%; }
+        #home-page { flex-grow: 1; }
 
         .category-item { 
             background: #f1f8e9; 
-            margin: 8px 0; 
-            padding: 15px; 
-            border-radius: 10px; 
+            margin: 10px 0; 
+            padding: 16px; 
+            border-radius: 12px; 
             cursor: pointer; 
             font-weight: bold; 
             display: flex; 
@@ -58,100 +55,99 @@
 
         .hidden { display: none !important; }
 
-        .item-row { padding: 12px 0; border-bottom: 1px solid #eee; width: 100%; }
+        .item-row { padding: 15px 0; border-bottom: 1px solid #eee; }
         
         .item-name { 
             font-weight: bold; 
             display: flex; 
             align-items: center; 
             gap: 10px; 
-            margin-bottom: 10px; 
+            margin-bottom: 12px; 
             color: #333;
-            font-size: 1rem;
         }
 
-        /* ग्रिड को मोबाइल के लिए बेहतर बनाया */
+        /* Responsive Grid for Qty, Unit, Rate */
         .controls-grid { 
             display: grid; 
             grid-template-columns: 1fr 1fr 1fr; 
-            gap: 5px; 
-            margin-bottom: 8px; 
+            gap: 8px; 
+            margin-bottom: 10px; 
         }
 
         input, select { 
-            padding: 10px 5px; 
+            padding: 12px 8px; 
             border: 1px solid #ccc; 
-            border-radius: 6px; 
-            font-size: 0.9rem; 
+            border-radius: 8px; 
+            font-size: 16px; /* Prevents auto-zoom on iOS */
             width: 100%; 
             outline: none;
         }
 
         .total-box { 
             background: #fffde7; 
-            padding: 6px; 
+            padding: 8px; 
             border-radius: 6px; 
             text-align: right; 
             font-weight: bold; 
             color: #d32f2f; 
-            font-size: 0.85rem; 
+            font-size: 0.9rem; 
         }
 
-        .summary-card { background: #e8f5e9; border: 2px dashed var(--primary); padding: 12px; border-radius: 10px; margin: 10px 0; width: 100%; }
-        .summary-item { display: flex; justify-content: space-between; border-bottom: 1px solid #c8e6c9; padding: 5px 0; font-size: 0.9rem; }
+        /* Summary Section */
+        .summary-card { background: #e8f5e9; border: 2px dashed var(--primary); padding: 15px; border-radius: 10px; margin: 15px 0; }
+        .summary-item { display: flex; justify-content: space-between; border-bottom: 1px solid #c8e6c9; padding: 6px 0; font-size: 0.9rem; }
         
         .btn-summary { 
             background: #ff9800; 
             color: white; 
             border: none; 
-            padding: 12px; 
+            padding: 14px; 
             border-radius: 8px; 
             width: 100%; 
             font-weight: bold; 
             margin-bottom: 10px; 
-            cursor: pointer;
-            font-size: 0.9rem;
+            font-size: 1rem;
         }
 
         .footer-btns { 
+            position: sticky; 
+            bottom: 0; 
             background: white; 
             padding: 15px 0; 
             display: flex; 
-            gap: 8px; 
-            margin-top: 10px;
+            gap: 10px; 
+            z-index: 10; 
         }
 
-        button { flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.9rem; }
+        button { flex: 1; padding: 14px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
         .btn-back { background: #eceff1; color: #455a64; }
         .btn-save { background: var(--primary); color: white; }
         
         .whatsapp-section { 
             margin-top: auto; 
-            padding-top: 15px; 
+            padding-top: 20px; 
             border-top: 2px solid #eee; 
-            background: white;
         }
 
-        .num-row { display: flex; gap: 5px; width: 100%; }
-        .num-input { flex: 1; border: 2px solid #81c784; font-size: 1rem; }
-        .btn-contact { background: #007bff; color: white; padding: 0 10px; font-size: 0.75rem; border-radius: 6px; }
+        .num-row { display: flex; gap: 8px; margin-top: 5px; }
+        .num-input { flex: 1; border: 2px solid #81c784; font-size: 1.1rem; font-weight: bold; }
+        .btn-contact { background: #007bff; color: white; padding: 0 12px; font-size: 0.8rem; border-radius: 8px; }
         
         .btn-wa { 
             background: #25D366; 
             color: white; 
             width: 100%; 
             font-size: 1.1rem; 
-            height: 50px; 
+            height: 55px; 
             display: flex; 
             align-items: center; 
             justify-content: center; 
             gap: 10px; 
-            border-radius: 10px; 
-            margin-top: 10px;
+            border-radius: 12px; 
+            margin-top: 15px;
         }
         
-        /* Checkbox साइज फिक्स */
-        input[type="checkbox"] { width: 20px; height: 20px; cursor: pointer; }
+        input[type="checkbox"] { width: 22px; height: 22px; cursor: pointer; }
 
     </style>
 </head>
@@ -164,7 +160,7 @@
         <button class="btn-summary" onclick="toggleSummary()">অর্ডার সামারি দেখুন</button>
         
         <div id="summary-view" class="summary-card hidden">
-            <h3 style="margin-top:0; color: var(--primary); font-size: 1rem;">নির্বাচিত আইটেম:</h3>
+            <h3 style="margin-top:0; color: var(--primary); font-size: 1rem;">নির্বাচিত সামগ্রী:</h3>
             <div id="summary-list"></div>
             <div id="grand-total-summary" style="text-align:right; font-weight:bold; margin-top:10px; color: #d32f2f;"></div>
         </div>
@@ -183,7 +179,7 @@
 
     <div class="whatsapp-section">
         <div class="contact-picker-area">
-            <label style="font-weight: bold; color: #555; font-size: 0.8rem; margin-bottom: 5px; display: block;">নম্বর লিখুন (WhatsApp Number):</label>
+            <label style="font-weight: bold; color: #555; font-size: 0.85rem;">WhatsApp নম্বর (91xxx):</label>
             <div class="num-row">
                 <input type="tel" id="wa-num" class="num-input" placeholder="91XXXXXXXXXX">
                 <button id="btn-picker" class="btn-contact" onclick="selectFromContacts()">Contacts</button>
@@ -197,7 +193,7 @@
 </div>
 
 <script>
-    // आपका पुराना JavaScript यहाँ रहेगा (कोई बदलाव की जरूरत नहीं)
+    // Logic for Data and Summary
     const data = {
         "A) নিত্যপ্রয়োজনীয় সবজি": ["আলু", "পেঁয়াজ", "আদা", "রসুন", "কাঁচা লঙ্কা"],
         "B) ডাল ও শস্য": ["চাল", "আটা", "ময়দা", "সর্ষের তেল", "চিনি", "চা পাতা", "মুসুর ডাল", "মুড়ি", "গুড়", "মটর", "মুগ ডাল", "ছোলা", "অড়হর ডাল"],
@@ -243,12 +239,12 @@
                     </select>
                     <input type="number" id="r-${item}" placeholder="Rate" value="${saved.rate}" oninput="updatePrice('${item}')">
                 </div>
-                <div class="total-box">মোট দাম: ₹ <span id="t-${item}">0.00</span></div>
+                <div class="total-box">দাম: ₹ <span id="t-${item}">0.00</span></div>
             `;
             container.appendChild(div);
             updatePrice(item);
         });
-        window.scrollTo(0,0); // स्क्रॉल टॉप पर लाएं
+        window.scrollTo(0,0);
     }
 
     function updatePrice(item) {
@@ -307,16 +303,16 @@
         }
 
         if (count === 0) {
-            listDiv.innerHTML = '<p style="color:#666; font-size:12px;">কোনো আইটেম নেই</p>';
+            listDiv.innerHTML = '<p style="color:#666; font-size:12px;">কিছুই নির্বাচন করা হয়নি</p>';
             grandTotalDiv.innerText = "";
         } else {
-            grandTotalDiv.innerText = "মোট: ₹ " + grandTotal.toFixed(2);
+            grandTotalDiv.innerText = "সর্বমোট: ₹ " + grandTotal.toFixed(2);
         }
     }
 
     function sendWA() {
         const num = document.getElementById('wa-num').value;
-        if(!num) return alert("নম্বর লিখুন!");
+        if(!num) return alert("দয়া করে নম্বর লিখুন!");
         
         let msg = "*🛒 বাজার লিস্ট:* \n";
         let grandTotal = 0;
@@ -330,8 +326,8 @@
             hasItems = true;
         }
         
-        if(!hasItems) return alert("আইটেম যোগ করুন!");
-        msg += `\n\n💰 *সর্বমোট: ₹${grandTotal.toFixed(2)}*`;
+        if(!hasItems) return alert("আগে আইটেম যোগ করুন!");
+        msg += `\n\n💰 *সর্বমোট বিল: ₹${grandTotal.toFixed(2)}*`;
         window.open(`https://wa.me/${num}?text=${encodeURIComponent(msg)}`);
     }
 
@@ -343,7 +339,7 @@
                 if(rawNum.length === 10) rawNum = "91" + rawNum;
                 document.getElementById('wa-num').value = rawNum;
             }
-        } catch (err) { alert("Not supported on this browser."); }
+        } catch (err) { console.log("Picker not used"); }
     }
 
     init();
