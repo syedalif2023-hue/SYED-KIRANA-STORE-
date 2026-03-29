@@ -1,7 +1,7 @@
 {
-  "name": "Smart Grocery App",
-  "short_name": "GroceryApp",
-  "description": "Smart way to manage your grocery list and send orders via WhatsApp.",
+  "name": "Syed Smart Grocery App",
+  "short_name": "SyedGrocery",
+  "description": "সহজেই বাজারের লিস্ট তৈরি করুন এবং অর্ডার দিন।",
   "start_url": "index.html",
   "display": "standalone",
   "background_color": "#f4f7f4",
@@ -10,9 +10,14 @@
   "icons": [
     {
       "src": "https://i.postimg.cc/j57H1PP8/file-0000000062fc7208bcb58f5264a5b1d7.png",
-      "sizes": "512x512",
+      "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
+    },
+    {
+      "src": "https://i.postimg.cc/j57H1PP8/file-0000000062fc7208bcb58f5264a5b1d7.png",
+      "sizes": "512x512",
+      "type": "image/png"
     }
   ]
 }

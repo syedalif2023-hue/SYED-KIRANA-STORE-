@@ -1,36 +1,37 @@
-const CACHE_NAME = 'grocery-v1';
-const ASSETS = [
+const CACHE_NAME = 'syed-grocery-v2';
+const ASSETS_TO_CACHE = [
   './',
   './index.html',
-  './manifest.json',
-  'https://i.postimg.cc/j57H1PP8/file-0000000062fc7208bcb58f5264a5b1d7.png'
+  './manifest.json'
 ];
 
-// इंस्टॉल इवेंट - फाइलों को कैश करना
+// সার্ভিস ওয়ার্কার ইন্সটল এবং ফাইল ক্যাশ করা
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS);
+      return cache.addAll(ASSETS_TO_CACHE);
     })
   );
+  self.skipWaiting();
 });
 
-// एक्टिवेट इवेंट - पुरानी कैश हटाना
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((keys) => {
-      return Promise.all(
-        keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
-      );
-    })
-  );
-});
-
-// फेच इवेंट - ऑफलाइन होने पर कैश से फाइल देना
+// অফলাইনে ফাইল সার্ভ করা
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request).then((response) => {
       return response || fetch(event.request);
     })
   );
+});
+
+// পুরানো ক্যাশ ডিলিট করে নতুন ভার্সন আপডেট করা
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((keys) => {
+      return Promise.all(
+        keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
+      );
+    })
+  );
+  self.clients.claim();
 });
